@@ -59,7 +59,6 @@ public sealed class HardwareInventoryService
     private static string Text(ManagementBaseObject item, string property) =>
         Convert.ToString(item[property], System.Globalization.CultureInfo.InvariantCulture)?.Trim() ?? "Unknown";
 
-}
 
     private static ulong Number(ManagementBaseObject item, string property)
     {
