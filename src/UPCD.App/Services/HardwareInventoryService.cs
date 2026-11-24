@@ -18,8 +18,7 @@ public sealed class HardwareInventoryService
             o => $"{Text(o, "NumberOfCores")} cores · {Text(o, "NumberOfLogicalProcessors")} threads · max {Text(o, "MaxClockSpeed")} MHz");
         Add(items, "GPU", "SELECT Name, DriverVersion, VideoProcessor FROM Win32_VideoController",
             o => $"driver {Text(o, "DriverVersion")} · {Text(o, "VideoProcessor")}");
-        Add(items, "RAM", "SELECT Capacity, Speed, Manufacturer, PartNumber, DeviceLocator FROM Win32_PhysicalMemory",
-            o => $"{FormatBytes(Number(o, "Capacity"))} · {Text(o, "Speed")} MHz · {Text(o, "Manufacturer")} {Text(o, "PartNumber")} · {Text(o, "DeviceLocator")}");
+        AddMemory(items);
         Add(items, "Motherboard", "SELECT Manufacturer, Product, Version FROM Win32_BaseBoard",
             o => $"{Text(o, "Manufacturer")} · {Text(o, "Product")} · {Text(o, "Version")}", "Product");
         Add(items, "BIOS", "SELECT Manufacturer, SMBIOSBIOSVersion, ReleaseDate FROM Win32_BIOS",
@@ -31,6 +30,73 @@ public sealed class HardwareInventoryService
         cancellationToken.ThrowIfCancellationRequested();
         return items;
     }
+
+    private static void AddMemory(List<HardwareItem> items)
+    {
+        var moduleCount = 0;
+        try
+        {
+            using var searcher = new ManagementObjectSearcher(
+                "SELECT Capacity, Speed, ConfiguredClockSpeed, Manufacturer, PartNumber, DeviceLocator, BankLabel FROM Win32_PhysicalMemory");
+            using var results = searcher.Get();
+
+            foreach (ManagementBaseObject module in results)
+            {
+                using (module)
+                {
+                    moduleCount++;
+                    var manufacturer = Text(module, "Manufacturer");
+                    var partNumber = Text(module, "PartNumber");
+                    var locator = Text(module, "DeviceLocator");
+                    var name = !IsUnknown(partNumber) ? partNumber :
+                        !IsUnknown(manufacturer) ? manufacturer :
+                        !IsUnknown(locator) ? locator : $"Memory module {moduleCount}";
+
+                    var speed = Text(module, "ConfiguredClockSpeed");
+                    if (IsUnknown(speed) || speed == "0")
+                        speed = Text(module, "Speed");
+
+                    var details = $"{FormatBytes(Number(module, "Capacity"))} · {speed} MHz · {manufacturer} · {locator}";
+                    items.Add(new HardwareItem("RAM", name, details));
+                }
+            }
+        }
+        catch (Exception ex) when (ex is ManagementException or UnauthorizedAccessException or System.Runtime.InteropServices.COMException or InvalidOperationException)
+        {
+            items.Add(new HardwareItem("RAM", "Module information unavailable", ex.Message, "WMI error"));
+        }
+
+        // Fallback: even if per-slot WMI data is unavailable, show the installed total memory.
+        if (moduleCount == 0)
+        {
+            try
+            {
+                using var searcher = new ManagementObjectSearcher(
+                    "SELECT TotalPhysicalMemory FROM Win32_ComputerSystem");
+                using var results = searcher.Get();
+                foreach (ManagementBaseObject system in results)
+                {
+                    using (system)
+                    {
+                        var total = Number(system, "TotalPhysicalMemory");
+                        if (total > 0)
+                        {
+                            items.Add(new HardwareItem("RAM", "Installed memory (total)",
+                                $"{FormatBytes(total)} · individual module details unavailable", "WMI fallback"));
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is ManagementException or UnauthorizedAccessException or System.Runtime.InteropServices.COMException or InvalidOperationException)
+            {
+                items.Add(new HardwareItem("RAM", "Memory information unavailable", ex.Message, "WMI error"));
+            }
+        }
+    }
+
+    private static bool IsUnknown(string value) =>
+        string.IsNullOrWhiteSpace(value) || value.Equals("Unknown", StringComparison.OrdinalIgnoreCase);
 
     private static void Add(List<HardwareItem> items, string category, string query, Func<ManagementBaseObject, string> details, string nameProperty = "Name")
     {
@@ -56,9 +122,17 @@ public sealed class HardwareInventoryService
         }
     }
 
-    private static string Text(ManagementBaseObject item, string property) =>
-        Convert.ToString(item[property], System.Globalization.CultureInfo.InvariantCulture)?.Trim() ?? "Unknown";
-
+    private static string Text(ManagementBaseObject item, string property)
+    {
+        try
+        {
+            return Convert.ToString(item[property], System.Globalization.CultureInfo.InvariantCulture)?.Trim() ?? "Unknown";
+        }
+        catch (Exception ex) when (ex is ManagementException or InvalidCastException or System.Runtime.InteropServices.COMException)
+        {
+            return "Unknown";
+        }
+    }
 
     private static ulong Number(ManagementBaseObject item, string property)
     {
@@ -66,7 +140,7 @@ public sealed class HardwareInventoryService
         {
             return Convert.ToUInt64(item[property], System.Globalization.CultureInfo.InvariantCulture);
         }
-        catch (Exception ex) when (ex is FormatException or InvalidCastException or OverflowException or ManagementException)
+        catch (Exception ex) when (ex is FormatException or InvalidCastException or OverflowException or ManagementException or System.Runtime.InteropServices.COMException)
         {
             return 0;
         }
