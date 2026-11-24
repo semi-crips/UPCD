@@ -7,6 +7,9 @@ namespace UPCD.App;
 
 public partial class MainWindow : Window
 {
+    private const string GitHubUrl = "https://github.com/semi-crips/UPCD";
+    private const string TelegramUrl = "https://t.me/+4Eh06gmqGhg5NjM6";
+
     private readonly MainViewModel _vm = new();
     private bool _initializing;
 
@@ -23,6 +26,22 @@ public partial class MainWindow : Window
             SelectByTag(ModeBox, _vm.ExperienceMode);
             _initializing = false;
             _vm.ApplyTheme();
+
+            // Open the project page once on the first launch for this Windows user.
+            if (_vm.ShouldOpenGitHubOnFirstLaunch)
+            {
+                try
+                {
+                    OpenExternalLink(GitHubUrl);
+                    await _vm.MarkGitHubOpenedAsync();
+                }
+                catch
+                {
+                    _vm.Status = _vm.IsEnglish
+                        ? "Could not open the GitHub page. Use the GitHub link in the sidebar."
+                        : "Не удалось открыть GitHub автоматически. Используйте ссылку в боковом меню.";
+                }
+            }
         };
     }
 
@@ -79,8 +98,8 @@ public partial class MainWindow : Window
     }
 
     private void Telegram_Click(object sender, RoutedEventArgs e) =>
-        OpenExternalLink("https://t.me/+4Eh06gmqGhg5NjM6");
+        OpenExternalLink(TelegramUrl);
 
     private void GitHub_Click(object sender, RoutedEventArgs e) =>
-        OpenExternalLink("https://github.com/semi-crips/UPCD");
+        OpenExternalLink(GitHubUrl);
 }
