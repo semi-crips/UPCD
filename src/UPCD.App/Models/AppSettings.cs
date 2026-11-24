@@ -10,4 +10,5 @@ public sealed class AppSettings
     public bool DownloadUpdatesOnWifi { get; set; } = true;
     public bool NotifyAboutUpdates { get; set; } = true;
     public bool InstallAfterConfirmation { get; set; } = true;
+    public bool HasOpenedGitHubOnFirstLaunch { get; set; }
 }
