@@ -6,7 +6,7 @@
  <Window.Resources>
   <Style TargetType="Button">
    <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"/>
-   <Setter Property="Background" Value="#182331"/>
+   <Setter Property="Background" Value="{DynamicResource PanelBackground}"/>
    <Setter Property="BorderBrush" Value="{DynamicResource PanelBorder}"/>
    <Setter Property="BorderThickness" Value="1"/>
    <Setter Property="Padding" Value="14,10"/>
