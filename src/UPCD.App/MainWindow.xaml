@@ -67,7 +67,24 @@
      <StackPanel>
       <TextBlock Text="{Binding ScanLabel}" FontSize="21" FontWeight="SemiBold"/>
       <TextBlock Text="{Binding SettingsHint}" Foreground="{DynamicResource SecondaryText}" Margin="0,8,0,16" MaxWidth="700"/>
-      <Button Content="{Binding ScanLabel}" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" Click="Scan_Click"/>
+      <Button Content="{Binding ScanLabel}" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" Click="Scan_Click" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBooleanConverter}}"/>
+      <TextBlock Text="{Binding HardwareSummary}" Foreground="{DynamicResource SecondaryText}" Margin="0,12,0,0"/>
+      <ItemsControl ItemsSource="{Binding HardwareItems}" Margin="0,12,0,0">
+       <ItemsControl.ItemTemplate>
+        <DataTemplate>
+         <Border Background="{DynamicResource PanelBackground}" BorderBrush="{DynamicResource PanelBorder}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,4">
+          <Grid>
+           <Grid.ColumnDefinitions><ColumnDefinition Width="115"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+           <TextBlock Text="{Binding Category}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top"/>
+           <StackPanel Grid.Column="1">
+            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Details}" Foreground="{DynamicResource SecondaryText}" FontSize="11" Margin="0,4,0,0"/>
+           </StackPanel>
+          </Grid>
+         </Border>
+        </DataTemplate>
+       </ItemsControl.ItemTemplate>
+      </ItemsControl>
      </StackPanel>
     </Border>
     <UniformGrid Columns="3" Margin="0,0,0,16">
