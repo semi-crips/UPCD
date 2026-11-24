@@ -67,7 +67,7 @@
      <StackPanel>
       <TextBlock Text="{Binding ScanLabel}" FontSize="21" FontWeight="SemiBold"/>
       <TextBlock Text="{Binding SettingsHint}" Foreground="{DynamicResource SecondaryText}" Margin="0,8,0,16" MaxWidth="700"/>
-      <Button Content="{Binding ScanLabel}" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" Click="Scan_Click" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBooleanConverter}}"/>
+      <Button Content="{Binding ScanLabel}" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" Click="Scan_Click"/>
       <TextBlock Text="{Binding HardwareSummary}" Foreground="{DynamicResource SecondaryText}" Margin="0,12,0,0"/>
       <ItemsControl ItemsSource="{Binding HardwareItems}" Margin="0,12,0,0">
        <ItemsControl.ItemTemplate>
