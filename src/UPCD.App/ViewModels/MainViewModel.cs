@@ -1,9 +1,10 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using UPCD.App.Models;
-using UPCD.App.Services;
+using UPCD.App.Services;\nusing UPCD.App.Models;
 
 namespace UPCD.App.ViewModels;
 
@@ -11,11 +12,17 @@ public sealed class MainViewModel : INotifyPropertyChanged
 {
     private readonly SettingsService _settingsService = new();
     private readonly UpdateService _updateService = new();
+    private readonly HardwareInventoryService _hardwareInventory = new();
+    private bool _isScanning;
     private AppSettings _settings = new();
     private string _selectedSection = "Главная";
     private string _status = "";
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public ObservableCollection<HardwareItem> HardwareItems { get; } = [];
+    public bool IsScanning { get => _isScanning; private set { if (_isScanning == value) return; _isScanning = value; OnPropertyChanged(); OnPropertyChanged(nameof(ScanLabel)); } }
+    public string HardwareSummary => HardwareItems.Count == 0 ? (IsEnglish ? "No inventory yet" : "Оборудование ещё не проверено") : (IsEnglish ? $"Found {HardwareItems.Count} hardware and system entries" : $"Обнаружено записей об оборудовании и системе: {HardwareItems.Count}");
 
     public string Language
     {
@@ -58,7 +65,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public string Subtitle => "Diagnose. Understand. Repair.";
     public string WelcomeLabel => IsEnglish ? "Welcome to Universal PC Doctor" : "Добро пожаловать в Universal PC Doctor";
     public string StatusLabel => IsEnglish ? "BETA PREVIEW" : "БЕТА-ПРЕДВАРИТЕЛЬНАЯ ВЕРСИЯ";
-    public string ScanLabel => IsEnglish ? "Start diagnostics" : "Начать диагностику";
+    public string ScanLabel => IsScanning ? (IsEnglish ? "Scanning…" : "Сканирование…") : (IsEnglish ? "Scan hardware" : "Определить оборудование");
     public string SettingsHint => IsEnglish
         ? "This foundation preview is a starting point. Hardware scanning will be added in later builds."
         : "Это основа будущей программы. Реальное определение оборудования появится в следующих версиях.";
@@ -80,7 +87,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(string.Empty);
     }
 
-    public async Task SaveSettingsAsync()
+    public async Task ScanHardwareAsync()\n    {\n        if (IsScanning) return;\n        IsScanning = true;\n        Status = IsEnglish ? "Reading hardware information from Windows…" : "Получаем сведения об оборудовании из Windows…";\n        HardwareItems.Clear();\n        OnPropertyChanged(nameof(HardwareSummary));\n        try\n        {\n            var found = await _hardwareInventory.ScanAsync();\n            foreach (var item in found) HardwareItems.Add(item);\n            Status = IsEnglish ? "Read-only hardware inventory completed. Check the detected values before relying on them." : "Сбор сведений завершён в режиме только чтения. Проверьте определённые значения.";\n        }\n        catch (Exception ex)\n        {\n            Status = (IsEnglish ? "Hardware scan failed: " : "Ошибка сканирования: ") + ex.Message;\n        }\n        finally\n        {\n            IsScanning = false;\n            OnPropertyChanged(nameof(HardwareSummary));\n        }\n    }\n\n    public async Task SaveSettingsAsync()
     {
         await _settingsService.SaveAsync(_settings);
         Status = IsEnglish ? "Settings saved." : "Настройки сохранены.";
@@ -121,7 +128,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         foreach (var property in new[]
         {
-            nameof(Navigation), nameof(IsEnglish), nameof(UpdateStatus), nameof(WelcomeLabel),
+            nameof(Navigation), nameof(IsEnglish), nameof(UpdateStatus), nameof(HardwareSummary), nameof(WelcomeLabel),
             nameof(StatusLabel), nameof(ScanLabel), nameof(SettingsHint), nameof(SettingsLabel),
             nameof(LanguageLabel), nameof(ThemeLabel), nameof(ModeLabel), nameof(AccentLabel),
             nameof(UpdatesLabel), nameof(AutoCheckLabel), nameof(WifiDownloadLabel),
