@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using UPCD.App.Models;
-using UPCD.App.Services;\nusing UPCD.App.Models;
+using UPCD.App.Services;
 
 namespace UPCD.App.ViewModels;
 
@@ -67,8 +67,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public string StatusLabel => IsEnglish ? "BETA PREVIEW" : "БЕТА-ПРЕДВАРИТЕЛЬНАЯ ВЕРСИЯ";
     public string ScanLabel => IsScanning ? (IsEnglish ? "Scanning…" : "Сканирование…") : (IsEnglish ? "Scan hardware" : "Определить оборудование");
     public string SettingsHint => IsEnglish
-        ? "This foundation preview is a starting point. Hardware scanning will be added in later builds."
-        : "Это основа будущей программы. Реальное определение оборудования появится в следующих версиях.";
+        ? "Read-only hardware inventory is available. Live sensors and diagnostic tests are still being developed."
+        : "Доступен сбор сведений об оборудовании в режиме чтения. Мониторинг датчиков и диагностические тесты ещё разрабатываются.";
     public string SettingsLabel => IsEnglish ? "Settings" : "Настройки";
     public string LanguageLabel => IsEnglish ? "Language" : "Язык";
     public string ThemeLabel => IsEnglish ? "Theme" : "Тема";
@@ -87,7 +87,31 @@ public sealed class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(string.Empty);
     }
 
-    public async Task ScanHardwareAsync()\n    {\n        if (IsScanning) return;\n        IsScanning = true;\n        Status = IsEnglish ? "Reading hardware information from Windows…" : "Получаем сведения об оборудовании из Windows…";\n        HardwareItems.Clear();\n        OnPropertyChanged(nameof(HardwareSummary));\n        try\n        {\n            var found = await _hardwareInventory.ScanAsync();\n            foreach (var item in found) HardwareItems.Add(item);\n            Status = IsEnglish ? "Read-only hardware inventory completed. Check the detected values before relying on them." : "Сбор сведений завершён в режиме только чтения. Проверьте определённые значения.";\n        }\n        catch (Exception ex)\n        {\n            Status = (IsEnglish ? "Hardware scan failed: " : "Ошибка сканирования: ") + ex.Message;\n        }\n        finally\n        {\n            IsScanning = false;\n            OnPropertyChanged(nameof(HardwareSummary));\n        }\n    }\n\n    public async Task SaveSettingsAsync()
+    public async Task ScanHardwareAsync()
+    {
+        if (IsScanning) return;
+        IsScanning = true;
+        Status = IsEnglish ? "Reading hardware information from Windows…" : "Получаем сведения об оборудовании из Windows…";
+        HardwareItems.Clear();
+        OnPropertyChanged(nameof(HardwareSummary));
+        try
+        {
+            var found = await _hardwareInventory.ScanAsync();
+            foreach (var item in found) HardwareItems.Add(item);
+            Status = IsEnglish ? "Read-only hardware inventory completed. Check the detected values before relying on them." : "Сбор сведений завершён в режиме только чтения. Проверьте определённые значения.";
+        }
+        catch (Exception ex)
+        {
+            Status = (IsEnglish ? "Hardware scan failed: " : "Ошибка сканирования: ") + ex.Message;
+        }
+        finally
+        {
+            IsScanning = false;
+            OnPropertyChanged(nameof(HardwareSummary));
+        }
+    }
+
+    public async Task SaveSettingsAsync()
     {
         await _settingsService.SaveAsync(_settings);
         Status = IsEnglish ? "Settings saved." : "Настройки сохранены.";
