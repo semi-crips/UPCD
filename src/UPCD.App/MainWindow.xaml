@@ -31,12 +31,12 @@
  <Grid Margin="22">
   <Grid.ColumnDefinitions><ColumnDefinition Width="235"/><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
   <Border Grid.Column="0" Style="{StaticResource GlassPanel}" Padding="16">
-   <DockPanel>
+   <DockPanel LastChildFill="False">
     <StackPanel DockPanel.Dock="Top" Margin="4,4,4,24">
      <TextBlock Text="◈  Universal PC Doctor" FontSize="17" FontWeight="SemiBold"/>
      <TextBlock Text="BETA 0.1.0" Foreground="{DynamicResource SecondaryText}" FontSize="10" Margin="27,5,0,0"/>
     </StackPanel>
-    <StackPanel>
+    <StackPanel DockPanel.Dock="Top">
      <ItemsControl ItemsSource="{Binding Navigation}">
       <ItemsControl.ItemTemplate>
        <DataTemplate>
