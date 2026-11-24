@@ -60,3 +60,33 @@ public sealed class HardwareInventoryService
         Convert.ToString(item[property], System.Globalization.CultureInfo.InvariantCulture)?.Trim() ?? "Unknown";
 
 }
+
+    private static ulong Number(ManagementBaseObject item, string property)
+    {
+        try
+        {
+            return Convert.ToUInt64(item[property], System.Globalization.CultureInfo.InvariantCulture);
+        }
+        catch (Exception ex) when (ex is FormatException or InvalidCastException or OverflowException or ManagementException)
+        {
+            return 0;
+        }
+    }
+
+    private static string FormatBytes(ulong bytes)
+    {
+        if (bytes == 0)
+            return "Size unknown";
+
+        string[] units = ["B", "KB", "GB", "TB"];
+        double value = bytes;
+        var unit = 0;
+        while (value >= 1024 && unit < units.Length - 1)
+        {
+            value /= 1024;
+            unit++;
+        }
+
+        return $"{value:0.##} {units[unit]}";
+    }
+}
