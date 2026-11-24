@@ -85,11 +85,9 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Scan_Click(object sender, RoutedEventArgs e)
+    private async void Scan_Click(object sender, RoutedEventArgs e)
     {
-        _vm.Status = _vm.IsEnglish
-            ? "Hardware scanning is not implemented in this foundation preview."
-            : "Определение оборудования ещё не реализовано в этой предварительной версии.";
+        await _vm.ScanHardwareAsync();
     }
 
     private static void OpenExternalLink(string url)
