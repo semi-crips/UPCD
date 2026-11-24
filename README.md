@@ -14,7 +14,8 @@ Universal PC Doctor is an early Windows desktop project intended to grow into a 
 - System, Dark, and Light theme selection
 - Accent color palette
 - Local settings persistence under `%LOCALAPPDATA%\UniversalPCDoctor\settings.json`
-- First-launch GitHub page opening (once per Windows user profile)\n- Update preference settings and Wi-Fi/network readiness display; no update feed is configured and no update is downloaded or installed
+- First-launch GitHub page opening (once per Windows user profile)
+- Update preference settings and Wi-Fi/network readiness display; no update feed is configured and no update is downloaded or installed
 - Telegram and GitHub community links in the lower-left sidebar
 
 ## Planned development
