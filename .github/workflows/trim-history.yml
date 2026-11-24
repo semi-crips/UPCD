@@ -1,0 +1,70 @@
+name: Trim maintenance branch history
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: upcd-history-trim
+  cancel-in-progress: false
+
+jobs:
+  trim:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Keep only the latest 10 commits
+        shell: bash
+        env:
+          BRANCH: maintenance/cleanup-and-build-fixes
+          EXPECTED_HEAD: 50765b374655b99efda9df86926d8e1d269f3304
+        run: |
+          set -euo pipefail
+
+          git fetch origin "${BRANCH}"
+          OLD_HEAD="$(git rev-parse "origin/${BRANCH}")"
+
+          if [[ "${OLD_HEAD}" != "${EXPECTED_HEAD}" ]]; then
+            echo "::error::Branch head changed since this cleanup was prepared. Expected ${EXPECTED_HEAD}, found ${OLD_HEAD}. No changes pushed."
+            exit 1
+          fi
+
+          mapfile -t COMMITS < <(git rev-list --reverse --max-count=10 "${OLD_HEAD}")
+          if [[ "${#COMMITS[@]}" -ne 10 ]]; then
+            echo "::error::Expected at least 10 commits; found ${#COMMITS[@]}."
+            exit 1
+          fi
+
+          FIRST="${COMMITS[0]}"
+          TEMP_BRANCH="upcd-history-trim"
+
+          git checkout --orphan "${TEMP_BRANCH}" "${FIRST}"
+          git -c core.hooksPath=/dev/null commit --allow-empty -C "${FIRST}"
+
+          for COMMIT in "${COMMITS[@]:1}"; do
+            git cherry-pick "${COMMIT}"
+          done
+
+          NEW_COUNT="$(git rev-list --count HEAD)"
+          if [[ "${NEW_COUNT}" -ne 10 ]]; then
+            echo "::error::Safety check failed: rewritten history has ${NEW_COUNT} commits, not 10."
+            exit 1
+          fi
+
+          if ! git diff --quiet "${OLD_HEAD}" HEAD; then
+            echo "::error::Safety check failed: rewritten branch tree differs from the original. Nothing pushed."
+            exit 1
+          fi
+
+          NEW_HEAD="$(git rev-parse HEAD)"
+          echo "Original head: ${OLD_HEAD}"
+          echo "New head:      ${NEW_HEAD}"
+          echo "Commit count:  ${NEW_COUNT}"
+          git push --force-with-lease="refs/heads/${BRANCH}:${OLD_HEAD}" origin "HEAD:refs/heads/${BRANCH}"
