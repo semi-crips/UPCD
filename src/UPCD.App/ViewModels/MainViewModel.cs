@@ -41,7 +41,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public bool IsEnglish => Language == "en";
     public string SelectedSection { get => _selectedSection; set { if (_selectedSection == value) return; _selectedSection = value; OnPropertyChanged(); } }
     public string Status { get => _status; set { if (_status == value) return; _status = value; OnPropertyChanged(); } }
-    public string UpdateStatus => _updateService.GetReadinessMessage(IsEnglish);\n    public bool ShouldOpenGitHubOnFirstLaunch => !_settings.HasOpenedGitHubOnFirstLaunch;\n\n    public async Task MarkGitHubOpenedAsync()\n    {\n        _settings.HasOpenedGitHubOnFirstLaunch = true;\n        await _settingsService.SaveAsync(_settings);\n    }
+    public string UpdateStatus => _updateService.GetReadinessMessage(IsEnglish);
+    public bool ShouldOpenGitHubOnFirstLaunch => !_settings.HasOpenedGitHubOnFirstLaunch;
+
+    public async Task MarkGitHubOpenedAsync()
+    {
+        _settings.HasOpenedGitHubOnFirstLaunch = true;
+        await _settingsService.SaveAsync(_settings);
+    }
 
     public string[] Navigation => IsEnglish
         ? ["Home", "Hardware", "Diagnostics", "Monitoring", "Windows errors", "BIOS guide", "History", "Settings", "Feedback"]
