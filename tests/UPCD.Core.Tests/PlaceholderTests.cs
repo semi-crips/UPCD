@@ -1,4 +1,5 @@
-using xunit
+using Xunit;
+
 namespace UPCD.Core.Tests;
 
 public class PlaceholderTests

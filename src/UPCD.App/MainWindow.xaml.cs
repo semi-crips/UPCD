@@ -1,5 +1,6 @@
+using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;\nusing System.Diagnostics;
+using System.Windows.Controls;
 using UPCD.App.ViewModels;
 
 namespace UPCD.App;
@@ -27,7 +28,8 @@ public partial class MainWindow : Window
 
     private static void SelectByTag(ComboBox box, string tag)
     {
-        box.SelectedItem = box.Items.Cast<ComboBoxItem>().FirstOrDefault(x => (string?)x.Tag == tag);
+        box.SelectedItem = box.Items.Cast<ComboBoxItem>()
+            .FirstOrDefault(x => string.Equals(x.Tag?.ToString(), tag, StringComparison.OrdinalIgnoreCase));
     }
 
     private void Setting_Changed(object sender, SelectionChangedEventArgs e)
@@ -39,7 +41,10 @@ public partial class MainWindow : Window
         _vm.ApplyTheme();
     }
 
-    private async void Save_Click(object sender, RoutedEventArgs e) => await _vm.SaveSettingsAsync();
+    private async void Save_Click(object sender, RoutedEventArgs e)
+    {
+        await _vm.SaveSettingsAsync();
+    }
 
     private void Accent_Click(object sender, RoutedEventArgs e)
     {
@@ -56,8 +61,8 @@ public partial class MainWindow : Window
         {
             _vm.SelectedSection = section;
             _vm.Status = _vm.IsEnglish
-                ? $"{section} module is planned; this foundation build does not perform hardware operations."
-                : $"Модуль «{section}» запланирован; эта основа пока не выполняет операции с оборудованием.";
+                ? $"The {section} module is planned; this preview does not perform hardware operations."
+                : $"Модуль «{section}» запланирован; эта версия пока не выполняет операции с оборудованием.";
         }
     }
 
@@ -67,4 +72,15 @@ public partial class MainWindow : Window
             ? "Hardware scanning is not implemented in this foundation preview."
             : "Определение оборудования ещё не реализовано в этой предварительной версии.";
     }
+
+    private static void OpenExternalLink(string url)
+    {
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+
+    private void Telegram_Click(object sender, RoutedEventArgs e) =>
+        OpenExternalLink("https://t.me/+4Eh06gmqGhg5NjM6");
+
+    private void GitHub_Click(object sender, RoutedEventArgs e) =>
+        OpenExternalLink("https://github.com/semi-crips/UPCD");
 }
