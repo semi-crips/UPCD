@@ -1,49 +1,58 @@
-# Universal PC Doctor — Foundation Preview 0.1.0
+# Universal PC Doctor — 0.1.0 Foundation Preview
 
-This is the initial Windows desktop project scaffold, not a complete PC diagnostic utility.
+**Diagnose. Understand. Repair.**
 
-## Technology
-- C# / .NET 10
-- WPF
-- MVVM-oriented structure
-- Local JSON settings in `%LOCALAPPDATA%\\UniversalPCDoctor\\settings.json`
-- xUnit test project
+Universal PC Doctor is an early Windows desktop project intended to grow into a diagnostic assistant for home PCs, gaming PCs, workstations, and (in later stages) servers.
+
+> **Status: very early foundation preview.** This is not yet a working PC diagnostic suite. Hardware inventory, sensor monitoring, diagnostic tests, Windows log analysis, and repair workflows are not implemented.
+
+## Current foundation
+
+- C# / .NET 10 and WPF desktop application
+- English and Russian interface labels
+- Simple and Advanced interface modes (initial settings foundation)
+- System, Dark, and Light theme selection
+- Accent color palette
+- Local settings persistence under `%LOCALAPPDATA%\UniversalPCDoctor\settings.json`
+- Update preference settings; no update feed is configured and no update is downloaded or installed
+- Telegram and GitHub community links
+
+## Planned development
+
+1. Reliable hardware inventory with user confirmation
+2. Sensor monitoring for temperatures, clocks, fan and pump speeds where hardware exposes them
+3. Diagnostics for CPU, GPU, RAM, storage, Windows, and drivers
+4. Windows Event Log and crash-dump analysis
+5. Safe repair guidance with explicit consent, audit trail, and rollback considerations
+6. Signed, user-confirmed updates
+7. Privacy-conscious feedback and diagnostic report export
+
+## Safety principles
+
+- Read-only diagnostics by default.
+- Never invent sensor readings or claim a diagnosis without evidence.
+- No automatic BIOS, voltage, frequency, or driver changes.
+- Each risky action requires separate explicit user consent.
+- Update installation remains user-confirmed; no update endpoint is configured in this preview.
 
 ## Requirements
+
 - Windows 10/11
 - .NET 10 SDK
+- Visual Studio 2026 with the .NET desktop development workload (optional)
 
-## Run
-Open `UniversalPCDoctor.slnx` in Visual Studio 2026 with the .NET desktop development workload, or run:
+## Build and run
 
 ```powershell
+dotnet restore .\UniversalPCDoctor.slnx
+dotnet build .\UniversalPCDoctor.slnx
 dotnet run --project .\src\UPCD.App\UPCD.App.csproj
+dotnet test .\UniversalPCDoctor.slnx
 ```
 
-## Current functionality
-- Initial WPF window and navigation shell
-- English/Russian UI labels
-- Simple/Advanced mode setting
-- System/Dark/Light theme selector (system theme reads the Windows app-theme preference)
-- Accent palette selector
-- Local persistence for settings
-- Update preferences and Wi-Fi/internet availability detection
+## Community
 
-## Not implemented yet
-- Hardware inventory and confirmation workflow
-- Sensor and fan RPM collection
-- Stress tests and diagnostics
-- Windows event log analysis
-- Repair operations
-- Signed update feed, download/installation workflow, and feedback backend
+- Telegram: https://t.me/+4Eh06gmqGhg5NjM6
+- GitHub: https://github.com/semi-crips/UPCD
 
-No hardware changes are made. The app does not request administrator privileges.
-
-## Important engineering notes
-- Do not present sensor values as real until a sensor provider reports them.
-- Do not add automatic repair actions without per-action consent, logging, and rollback analysis.
-- Before public beta, add automated tests, accessibility review, secure update signing, privacy review, and installer signing.
-
-## Update safety
-Update preferences are present and saved locally. The preview can detect whether a Wi-Fi interface and network connection are available. The signed update feed is intentionally not configured yet, so this build does not download or install updates. Before enabling real updates, the project needs a controlled HTTPS release feed, signed packages, signature/hash verification, staged rollout, and rollback testing. Installation must remain user-confirmed.
-\n## Community links\n- Telegram channel: https://t.me/+4Eh06gmqGhg5NjM6\n- GitHub repository button is present as a placeholder until the repository URL is supplied.\n
+Contributions and bug reports are welcome. Please remember that this is an experimental project and should not be relied on as a repair tool yet.
