@@ -10,7 +10,7 @@ public sealed class UpdateNetworkStatus
 
 public sealed class UpdateService
 {
-    // Configure only after a real HTTPS release feed and signed packages exist.
+    // Configure only after a trusted HTTPS release feed and verifiable packages exist.
     private const string? UpdateFeedUri = null;
 
     public UpdateNetworkStatus GetNetworkStatus()
@@ -30,14 +30,25 @@ public sealed class UpdateService
 
     public string GetReadinessMessage(bool isEnglish)
     {
+        var status = GetNetworkStatus();
+
+        if (!status.HasInternet)
+            return isEnglish
+                ? "No active network connection detected. Update source is not configured."
+                : "Активное сетевое подключение не обнаружено. Источник обновлений не настроен.";
+
+        if (!status.HasWifiConnection)
+            return isEnglish
+                ? "Internet connection detected; Wi-Fi interface is not active. Update source is not configured."
+                : "Сетевое подключение обнаружено, но Wi-Fi не активен. Источник обновлений не настроен.";
+
         if (!IsUpdateFeedConfigured)
             return isEnglish
-                ? "Update feed is not configured yet. This preview will not download or install updates."
-                : "Источник обновлений пока не настроен. Эта версия не загружает и не устанавливает обновления.";
+                ? "Wi-Fi detected. Automatic update checks and downloads are not available yet because no trusted update source is configured."
+                : "Wi-Fi обнаружен. Автопроверка и загрузка обновлений пока недоступны: доверенный источник обновлений ещё не настроен.";
 
-        var status = GetNetworkStatus();
-        if (!status.HasInternet) return isEnglish ? "No internet connection." : "Нет подключения к интернету.";
-        if (!status.HasWifiConnection) return isEnglish ? "Internet is available, but Wi-Fi is not connected." : "Интернет доступен, но Wi-Fi не подключён.";
-        return isEnglish ? "Wi-Fi is available for update checks." : "Wi-Fi доступен для проверки обновлений.";
+        return isEnglish
+            ? "Wi-Fi detected. The update source is configured and ready for a check."
+            : "Wi-Fi обнаружен. Источник обновлений настроен и готов к проверке.";
     }
 }
