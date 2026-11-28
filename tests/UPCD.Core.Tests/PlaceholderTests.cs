@@ -16,6 +16,7 @@ public sealed class AppSettingsTests
         Assert.Equal("simple", settings.ExperienceMode);
         Assert.Equal("#398BFA", settings.AccentHex);
         Assert.True(settings.InstallAfterConfirmation);
+        Assert.False(settings.HasOpenedGitHubOnFirstLaunch);
     }
 
     [Fact]
