@@ -75,6 +75,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public string SelectedSection { get => _selectedSection; set { if (_selectedSection == value) return; _selectedSection = value; OnPropertyChanged(); } }
     public string Status { get => _status; set { if (_status == value) return; _status = value; OnPropertyChanged(); } }
     public string UpdateStatus => _updateService.GetReadinessMessage(IsEnglish);
+    public bool UpdateOptionsEnabled => _updateService.IsUpdateFeedConfigured;
     public bool ShouldOpenGitHubOnFirstLaunch => !_settings.HasOpenedGitHubOnFirstLaunch;
 
     public async Task MarkGitHubOpenedAsync()
@@ -196,7 +197,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         foreach (var property in new[]
         {
-            nameof(Navigation), nameof(IsEnglish), nameof(UpdateStatus), nameof(HardwareSummary), nameof(CpuSummary), nameof(GpuSummary), nameof(MemorySummary), nameof(WelcomeLabel),
+            nameof(Navigation), nameof(IsEnglish), nameof(UpdateStatus), nameof(UpdateOptionsEnabled), nameof(HardwareSummary), nameof(CpuSummary), nameof(GpuSummary), nameof(MemorySummary), nameof(WelcomeLabel),
             nameof(StatusLabel), nameof(ScanLabel), nameof(SettingsHint), nameof(SettingsLabel),
             nameof(LanguageLabel), nameof(ThemeLabel), nameof(ModeLabel), nameof(AccentLabel),
             nameof(UpdatesLabel), nameof(AutoCheckLabel), nameof(WifiDownloadLabel),
