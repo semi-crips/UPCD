@@ -4,7 +4,7 @@ namespace UPCD.App.Services;
 
 public sealed class UpdateNetworkStatus
 {
-    public bool HasInternet { get; init; }
+    public bool HasNetworkConnection { get; init; }
     public bool HasWifiConnection { get; init; }
 }
 
@@ -17,9 +17,11 @@ public sealed class UpdateService
     {
         var interfaces = NetworkInterface.GetAllNetworkInterfaces()
             .Where(n => n.OperationalStatus == OperationalStatus.Up);
+
         return new UpdateNetworkStatus
         {
-            HasInternet = NetworkInterface.GetIsNetworkAvailable(),
+            // This API reports network availability, not verified Internet reachability.
+            HasNetworkConnection = NetworkInterface.GetIsNetworkAvailable(),
             HasWifiConnection = interfaces.Any(n => n.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
         };
     }
@@ -32,14 +34,14 @@ public sealed class UpdateService
     {
         var status = GetNetworkStatus();
 
-        if (!status.HasInternet)
+        if (!status.HasNetworkConnection)
             return isEnglish
                 ? "No active network connection detected. Update source is not configured."
                 : "Активное сетевое подключение не обнаружено. Источник обновлений не настроен.";
 
         if (!status.HasWifiConnection)
             return isEnglish
-                ? "Internet connection detected; Wi-Fi interface is not active. Update source is not configured."
+                ? "Network connection detected; Wi-Fi interface is not active. Update source is not configured."
                 : "Сетевое подключение обнаружено, но Wi-Fi не активен. Источник обновлений не настроен.";
 
         if (!IsUpdateFeedConfigured)
