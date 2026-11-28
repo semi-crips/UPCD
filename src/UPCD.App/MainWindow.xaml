@@ -88,9 +88,9 @@
      </StackPanel>
     </Border>
     <UniformGrid Columns="3" Margin="0,0,0,16">
-     <Border Style="{StaticResource GlassPanel}" Margin="0,0,8,0"><StackPanel><TextBlock Text="CPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="Not scanned" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
-     <Border Style="{StaticResource GlassPanel}" Margin="4,0"><StackPanel><TextBlock Text="GPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="Not scanned" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
-     <Border Style="{StaticResource GlassPanel}" Margin="8,0,0,0"><StackPanel><TextBlock Text="Memory" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="Not scanned" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
+     <Border Style="{StaticResource GlassPanel}" Margin="0,0,8,0"><StackPanel><TextBlock Text="CPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="{Binding CpuSummary}" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
+     <Border Style="{StaticResource GlassPanel}" Margin="4,0"><StackPanel><TextBlock Text="GPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="{Binding GpuSummary}" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
+     <Border Style="{StaticResource GlassPanel}" Margin="8,0,0,0"><StackPanel><TextBlock Text="Memory" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="{Binding MemorySummary}" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
     </UniformGrid>
     <Border Style="{StaticResource GlassPanel}" Margin="0,0,0,16">
      <StackPanel>
