@@ -151,7 +151,7 @@ public sealed class HardwareInventoryService
         if (bytes == 0)
             return "Size unknown";
 
-        string[] units = ["B", "KB", "GB", "TB"];
+        string[] units = ["B", "KB", "MB", "GB", "TB"];
         double value = bytes;
         var unit = 0;
         while (value >= 1024 && unit < units.Length - 1)
