@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="src/UPCD.App/UPCD.App.csproj" />
-  <Project Path="tests/UPCD.Core.Tests/UPCD.Core.Tests.csproj" />
-</Solution>

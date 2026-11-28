@@ -60,13 +60,28 @@ public partial class MainWindow : Window
             .FirstOrDefault(x => string.Equals(x.Tag?.ToString(), tag, StringComparison.OrdinalIgnoreCase));
     }
 
-    private void Setting_Changed(object sender, SelectionChangedEventArgs e)
+    private async void Setting_Changed(object sender, SelectionChangedEventArgs e)
     {
         if (_initializing) return;
-        if (LanguageBox.SelectedValue is string lang) _vm.Language = lang;
-        if (ThemeBox.SelectedValue is string theme) _vm.Theme = theme;
-        if (ModeBox.SelectedValue is string mode) _vm.ExperienceMode = mode;
-        _vm.ApplyTheme();
+
+        // Handle only the control that changed. Reading every ComboBox here can
+        // overwrite a newly selected value with another control's stale value.
+        if (ReferenceEquals(sender, LanguageBox) && LanguageBox.SelectedValue is string language)
+        {
+            _vm.Language = language;
+        }
+        else if (ReferenceEquals(sender, ThemeBox) && ThemeBox.SelectedValue is string theme)
+        {
+            _vm.Theme = theme;
+            _vm.ApplyTheme();
+        }
+        else if (ReferenceEquals(sender, ModeBox) && ModeBox.SelectedValue is string mode)
+        {
+            _vm.ExperienceMode = mode;
+        }
+
+        // Persist each preference change immediately; no restart should be needed.
+        await _vm.SaveSettingsAsync();
     }
 
     private async void Save_Click(object sender, RoutedEventArgs e)
