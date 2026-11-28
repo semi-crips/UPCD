@@ -150,8 +150,15 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public async Task SaveSettingsAsync()
     {
-        await _settingsService.SaveAsync(_settings);
-        Status = IsEnglish ? "Settings saved." : "Настройки сохранены.";
+        try
+        {
+            await _settingsService.SaveAsync(_settings);
+            Status = IsEnglish ? "Settings saved." : "Настройки сохранены.";
+        }
+        catch (Exception ex)
+        {
+            Status = (IsEnglish ? "Could not save settings: " : "Не удалось сохранить настройки: ") + ex.Message;
+        }
     }
 
     public void ApplyTheme()
