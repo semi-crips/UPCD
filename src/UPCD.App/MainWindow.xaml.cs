@@ -9,6 +9,7 @@ public partial class MainWindow : Window
 {
     private const string GitHubUrl = "https://github.com/semi-crips/UPCD";
     private const string TelegramUrl = "https://t.me/+4Eh06gmqGhg5NjM6";
+    private const string FeedbackUrl = "https://github.com/semi-crips/UPCD/issues/new";
 
     private readonly MainViewModel _vm = new();
     private bool _initializing;
@@ -87,6 +88,12 @@ public partial class MainWindow : Window
         if (sender is Button { Tag: string section })
         {
             _vm.SelectedSection = section;
+            if (string.Equals(section, _vm.IsEnglish ? "Feedback" : "Обратная связь", StringComparison.Ordinal))
+            {
+                OpenExternalLink(FeedbackUrl);
+                return;
+            }
+
             _vm.Status = _vm.IsEnglish
                 ? $"The {section} module is planned; this preview does not perform hardware operations."
                 : $"Модуль «{section}» запланирован; эта версия пока не выполняет операции с оборудованием.";
