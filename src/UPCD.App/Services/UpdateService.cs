@@ -15,15 +15,23 @@ public sealed class UpdateService
 
     public UpdateNetworkStatus GetNetworkStatus()
     {
-        var interfaces = NetworkInterface.GetAllNetworkInterfaces()
-            .Where(n => n.OperationalStatus == OperationalStatus.Up);
-
-        return new UpdateNetworkStatus
+        try
         {
-            // This API reports network availability, not verified Internet reachability.
-            HasNetworkConnection = NetworkInterface.GetIsNetworkAvailable(),
-            HasWifiConnection = interfaces.Any(n => n.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
-        };
+            var interfaces = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(n => n.OperationalStatus == OperationalStatus.Up);
+
+            return new UpdateNetworkStatus
+            {
+                // This API reports network availability, not verified Internet reachability.
+                HasNetworkConnection = NetworkInterface.GetIsNetworkAvailable(),
+                HasWifiConnection = interfaces.Any(n => n.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+            };
+        }
+        catch (NetworkInformationException)
+        {
+            // Network enumeration must not prevent the application from starting.
+            return new UpdateNetworkStatus();
+        }
     }
 
     public bool IsUpdateFeedConfigured =>
