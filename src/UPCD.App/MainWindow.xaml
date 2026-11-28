@@ -6,7 +6,7 @@
  <Window.Resources>
   <Style TargetType="Button">
    <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"/>
-   <Setter Property="Background" Value="#182331"/>
+   <Setter Property="Background" Value="{DynamicResource PanelBackground}"/>
    <Setter Property="BorderBrush" Value="{DynamicResource PanelBorder}"/>
    <Setter Property="BorderThickness" Value="1"/>
    <Setter Property="Padding" Value="14,10"/>
@@ -31,12 +31,12 @@
  <Grid Margin="22">
   <Grid.ColumnDefinitions><ColumnDefinition Width="235"/><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
   <Border Grid.Column="0" Style="{StaticResource GlassPanel}" Padding="16">
-   <DockPanel>
+   <DockPanel LastChildFill="False">
     <StackPanel DockPanel.Dock="Top" Margin="4,4,4,24">
      <TextBlock Text="◈  Universal PC Doctor" FontSize="17" FontWeight="SemiBold"/>
      <TextBlock Text="BETA 0.1.0" Foreground="{DynamicResource SecondaryText}" FontSize="10" Margin="27,5,0,0"/>
     </StackPanel>
-    <StackPanel>
+    <StackPanel DockPanel.Dock="Top">
      <ItemsControl ItemsSource="{Binding Navigation}">
       <ItemsControl.ItemTemplate>
        <DataTemplate>
@@ -68,12 +68,29 @@
       <TextBlock Text="{Binding ScanLabel}" FontSize="21" FontWeight="SemiBold"/>
       <TextBlock Text="{Binding SettingsHint}" Foreground="{DynamicResource SecondaryText}" Margin="0,8,0,16" MaxWidth="700"/>
       <Button Content="{Binding ScanLabel}" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" Click="Scan_Click"/>
+      <TextBlock Text="{Binding HardwareSummary}" Foreground="{DynamicResource SecondaryText}" Margin="0,12,0,0"/>
+      <ItemsControl ItemsSource="{Binding HardwareItems}" Margin="0,12,0,0">
+       <ItemsControl.ItemTemplate>
+        <DataTemplate>
+         <Border Background="{DynamicResource PanelBackground}" BorderBrush="{DynamicResource PanelBorder}" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,4">
+          <Grid>
+           <Grid.ColumnDefinitions><ColumnDefinition Width="115"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+           <TextBlock Text="{Binding Category}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Top"/>
+           <StackPanel Grid.Column="1">
+            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding Details}" Foreground="{DynamicResource SecondaryText}" FontSize="11" Margin="0,4,0,0"/>
+           </StackPanel>
+          </Grid>
+         </Border>
+        </DataTemplate>
+       </ItemsControl.ItemTemplate>
+      </ItemsControl>
      </StackPanel>
     </Border>
     <UniformGrid Columns="3" Margin="0,0,0,16">
-     <Border Style="{StaticResource GlassPanel}" Margin="0,0,8,0"><StackPanel><TextBlock Text="CPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="Not scanned" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
-     <Border Style="{StaticResource GlassPanel}" Margin="4,0"><StackPanel><TextBlock Text="GPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="Not scanned" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
-     <Border Style="{StaticResource GlassPanel}" Margin="8,0,0,0"><StackPanel><TextBlock Text="Memory" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="Not scanned" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
+     <Border Style="{StaticResource GlassPanel}" Margin="0,0,8,0"><StackPanel><TextBlock Text="CPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="{Binding CpuSummary}" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
+     <Border Style="{StaticResource GlassPanel}" Margin="4,0"><StackPanel><TextBlock Text="GPU" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="{Binding GpuSummary}" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
+     <Border Style="{StaticResource GlassPanel}" Margin="8,0,0,0"><StackPanel><TextBlock Text="Memory" Foreground="{DynamicResource SecondaryText}"/><TextBlock Text="{Binding MemorySummary}" FontSize="18" Margin="0,8,0,0"/></StackPanel></Border>
     </UniformGrid>
     <Border Style="{StaticResource GlassPanel}" Margin="0,0,0,16">
      <StackPanel>
@@ -96,10 +113,10 @@
        <ItemsControl.ItemTemplate><DataTemplate><Button Width="30" Height="30" Padding="0" Margin="0,0,9,8" Background="{Binding}" BorderBrush="#80FFFFFF" Click="Accent_Click" Tag="{Binding}"/></DataTemplate></ItemsControl.ItemTemplate>
       </ItemsControl>
       <TextBlock Text="{Binding UpdatesLabel}" FontSize="16" FontWeight="SemiBold" Margin="0,14,0,8"/>
-      <CheckBox Content="{Binding AutoCheckLabel}" IsChecked="{Binding AutoCheckUpdates}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
-      <CheckBox Content="{Binding WifiDownloadLabel}" IsChecked="{Binding DownloadUpdatesOnWifi}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
-      <CheckBox Content="{Binding NotifyUpdatesLabel}" IsChecked="{Binding NotifyAboutUpdates}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
-      <CheckBox Content="{Binding ConfirmInstallLabel}" IsChecked="{Binding InstallAfterConfirmation}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding AutoCheckLabel}" IsChecked="{Binding AutoCheckUpdates}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding WifiDownloadLabel}" IsChecked="{Binding DownloadUpdatesOnWifi}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding NotifyUpdatesLabel}" IsChecked="{Binding NotifyAboutUpdates}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding ConfirmInstallLabel}" IsChecked="{Binding InstallAfterConfirmation}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
       <TextBlock Text="{Binding UpdateStatus}" Foreground="{DynamicResource SecondaryText}" FontSize="11" Margin="0,8,0,12"/>
       <Button Content="{Binding SaveLabel}" HorizontalAlignment="Left" Click="Save_Click" Background="{DynamicResource AccentBrush}"/>
       <TextBlock Text="{Binding Status}" Foreground="{DynamicResource SecondaryText}" Margin="0,10,0,0"/>

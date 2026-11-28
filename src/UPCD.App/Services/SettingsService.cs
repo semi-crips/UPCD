@@ -16,8 +16,11 @@ public sealed class SettingsService
         try
         {
             if (!File.Exists(_path)) return new AppSettings();
+
             await using var stream = File.OpenRead(_path);
-            return await JsonSerializer.DeserializeAsync<AppSettings>(stream) ?? new AppSettings();
+            var settings = await JsonSerializer.DeserializeAsync<AppSettings>(stream) ?? new AppSettings();
+            settings.Normalize();
+            return settings;
         }
         catch
         {
@@ -28,11 +31,30 @@ public sealed class SettingsService
 
     public async Task SaveAsync(AppSettings settings)
     {
+        ArgumentNullException.ThrowIfNull(settings);
+        settings.Normalize();
+
         var directory = Path.GetDirectoryName(_path)!;
         Directory.CreateDirectory(directory);
-        var tempPath = _path + ".tmp";
-        await using (var stream = File.Create(tempPath))
-            await JsonSerializer.SerializeAsync(stream, settings, JsonOptions);
-        File.Move(tempPath, _path, overwrite: true);
+
+        // A unique temporary file prevents overlapping saves from sharing the same .tmp file.
+        var tempPath = _path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            await using (var stream = new FileStream(
+                tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None,
+                bufferSize: 4096, useAsync: true))
+            {
+                await JsonSerializer.SerializeAsync(stream, settings, JsonOptions);
+                await stream.FlushAsync();
+            }
+
+            File.Move(tempPath, _path, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+        }
     }
 }

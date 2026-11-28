@@ -1,5 +1,0 @@
-C:\Users\gamew\Downloads\UniversalPCDoctor_0.1.0-foundation-telegram-integration\tests\UPCD.Core.Tests\obj\Debug\net10.0\UPCD.Core.Tests.csproj.AssemblyReference.cache
-C:\Users\gamew\Downloads\UniversalPCDoctor_0.1.0-foundation-telegram-integration\tests\UPCD.Core.Tests\obj\Debug\net10.0\UPCD.Core.Tests.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\gamew\Downloads\UniversalPCDoctor_0.1.0-foundation-telegram-integration\tests\UPCD.Core.Tests\obj\Debug\net10.0\UPCD.Core.Tests.AssemblyInfoInputs.cache
-C:\Users\gamew\Downloads\UniversalPCDoctor_0.1.0-foundation-telegram-integration\tests\UPCD.Core.Tests\obj\Debug\net10.0\UPCD.Core.Tests.AssemblyInfo.cs
-C:\Users\gamew\Downloads\UniversalPCDoctor_0.1.0-foundation-telegram-integration\tests\UPCD.Core.Tests\obj\Debug\net10.0\UPCD.Core.Tests.csproj.CoreCompileInputs.cache
