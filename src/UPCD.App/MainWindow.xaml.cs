@@ -30,12 +30,20 @@ public partial class MainWindow : Window
             // Open the project page once on the first launch for this Windows user.
             if (_vm.ShouldOpenGitHubOnFirstLaunch)
             {
-                try
+                if (TryOpenExternalLink(GitHubUrl))
                 {
-                    OpenExternalLink(GitHubUrl);
-                    await _vm.MarkGitHubOpenedAsync();
+                    try
+                    {
+                        await _vm.MarkGitHubOpenedAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        _vm.Status = (_vm.IsEnglish
+                            ? "GitHub opened, but the first-launch preference could not be saved: "
+                            : "GitHub открыт, но не удалось сохранить отметку первого запуска: ") + ex.Message;
+                    }
                 }
-                catch
+                else
                 {
                     _vm.Status = _vm.IsEnglish
                         ? "Could not open the GitHub page. Use the GitHub link in the sidebar."
@@ -90,9 +98,27 @@ public partial class MainWindow : Window
         await _vm.ScanHardwareAsync();
     }
 
-    private static void OpenExternalLink(string url)
+    private static bool TryOpenExternalLink(string url)
     {
-        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void OpenExternalLink(string url)
+    {
+        if (!TryOpenExternalLink(url))
+        {
+            _vm.Status = _vm.IsEnglish
+                ? "Could not open the link. Check your default browser settings."
+                : "Не удалось открыть ссылку. Проверьте настройки браузера по умолчанию.";
+        }
     }
 
     private void Telegram_Click(object sender, RoutedEventArgs e) =>
