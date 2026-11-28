@@ -113,10 +113,10 @@
        <ItemsControl.ItemTemplate><DataTemplate><Button Width="30" Height="30" Padding="0" Margin="0,0,9,8" Background="{Binding}" BorderBrush="#80FFFFFF" Click="Accent_Click" Tag="{Binding}"/></DataTemplate></ItemsControl.ItemTemplate>
       </ItemsControl>
       <TextBlock Text="{Binding UpdatesLabel}" FontSize="16" FontWeight="SemiBold" Margin="0,14,0,8"/>
-      <CheckBox Content="{Binding AutoCheckLabel}" IsChecked="{Binding AutoCheckUpdates}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
-      <CheckBox Content="{Binding WifiDownloadLabel}" IsChecked="{Binding DownloadUpdatesOnWifi}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
-      <CheckBox Content="{Binding NotifyUpdatesLabel}" IsChecked="{Binding NotifyAboutUpdates}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
-      <CheckBox Content="{Binding ConfirmInstallLabel}" IsChecked="{Binding InstallAfterConfirmation}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding AutoCheckLabel}" IsChecked="{Binding AutoCheckUpdates}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding WifiDownloadLabel}" IsChecked="{Binding DownloadUpdatesOnWifi}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding NotifyUpdatesLabel}" IsChecked="{Binding NotifyAboutUpdates}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
+      <CheckBox Content="{Binding ConfirmInstallLabel}" IsChecked="{Binding InstallAfterConfirmation}" IsEnabled="{Binding UpdateOptionsEnabled}" Foreground="{DynamicResource PrimaryText}" Margin="0,4"/>
       <TextBlock Text="{Binding UpdateStatus}" Foreground="{DynamicResource SecondaryText}" FontSize="11" Margin="0,8,0,12"/>
       <Button Content="{Binding SaveLabel}" HorizontalAlignment="Left" Click="Save_Click" Background="{DynamicResource AccentBrush}"/>
       <TextBlock Text="{Binding Status}" Foreground="{DynamicResource SecondaryText}" Margin="0,10,0,0"/>
