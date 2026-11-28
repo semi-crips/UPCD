@@ -47,4 +47,42 @@ public sealed class AppSettingsTests
         Assert.Equal(original.NotifyAboutUpdates, restored.NotifyAboutUpdates);
         Assert.Equal(original.InstallAfterConfirmation, restored.InstallAfterConfirmation);
     }
+
+    [Fact]
+    public void Normalize_RepairsInvalidPersistedValues()
+    {
+        var settings = new AppSettings
+        {
+            Language = "fr",
+            Theme = "neon",
+            ExperienceMode = "automatic",
+            AccentHex = "not-a-color"
+        };
+
+        settings.Normalize();
+
+        Assert.Equal("ru", settings.Language);
+        Assert.Equal("system", settings.Theme);
+        Assert.Equal("simple", settings.ExperienceMode);
+        Assert.Equal("#398BFA", settings.AccentHex);
+    }
+
+    [Fact]
+    public void Normalize_RepairsNullStringsFromMalformedJson()
+    {
+        var settings = new AppSettings
+        {
+            Language = null!,
+            Theme = null!,
+            ExperienceMode = null!,
+            AccentHex = null!
+        };
+
+        settings.Normalize();
+
+        Assert.Equal("ru", settings.Language);
+        Assert.Equal("system", settings.Theme);
+        Assert.Equal("simple", settings.ExperienceMode);
+        Assert.Equal("#398BFA", settings.AccentHex);
+    }
 }
