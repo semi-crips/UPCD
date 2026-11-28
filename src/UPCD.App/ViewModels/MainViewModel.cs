@@ -14,6 +14,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly UpdateService _updateService = new();
     private readonly HardwareInventoryService _hardwareInventory = new();
     private bool _isScanning;
+    private bool _hasScannedHardware;
     private AppSettings _settings = new();
     private string _selectedSection = "Главная";
     private string _status = "";
@@ -22,7 +23,29 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     public ObservableCollection<HardwareItem> HardwareItems { get; } = [];
     public bool IsScanning { get => _isScanning; private set { if (_isScanning == value) return; _isScanning = value; OnPropertyChanged(); OnPropertyChanged(nameof(ScanLabel)); } }
-    public string HardwareSummary => HardwareItems.Count == 0 ? (IsEnglish ? "No inventory yet" : "Оборудование ещё не проверено") : (IsEnglish ? $"Found {HardwareItems.Count} hardware and system entries" : $"Обнаружено записей об оборудовании и системе: {HardwareItems.Count}");
+    public string HardwareSummary => HardwareItems.Count == 0 ? (IsEnglish ? "No inventory entries" : "Сведения об оборудовании не получены") : (IsEnglish ? $"Found {HardwareItems.Count} hardware and system entries" : $"Получено записей об оборудовании и системе: {HardwareItems.Count}");
+    public string CpuSummary => GetCategorySummary("CPU");
+    public string GpuSummary => GetCategorySummary("GPU");
+    public string MemorySummary => GetMemorySummary();
+
+    private string GetCategorySummary(string category)
+    {
+        if (IsScanning) return IsEnglish ? "Scanning…" : "Сканирование…";
+        if (!_hasScannedHardware) return IsEnglish ? "Not scanned" : "Не проверено";
+        var item = HardwareItems.FirstOrDefault(x => x.Category.Equals(category, StringComparison.OrdinalIgnoreCase));
+        return item?.Name ?? (IsEnglish ? "Not detected" : "Не обнаружено");
+    }
+
+    private string GetMemorySummary()
+    {
+        if (IsScanning) return IsEnglish ? "Scanning…" : "Сканирование…";
+        if (!_hasScannedHardware) return IsEnglish ? "Not scanned" : "Не проверено";
+        var count = HardwareItems.Count(x => x.Category.Equals("RAM", StringComparison.OrdinalIgnoreCase));
+        if (count == 0) return IsEnglish ? "Not detected" : "Не обнаружено";
+        if (count == 1 && HardwareItems[0].Name.Equals("Installed memory (total)", StringComparison.OrdinalIgnoreCase))
+            return HardwareItems[0].Details;
+        return IsEnglish ? $"{count} module(s) detected" : $"Обнаружено модулей: {count}";
+    }
 
     public string Language
     {
@@ -93,11 +116,19 @@ public sealed class MainViewModel : INotifyPropertyChanged
         IsScanning = true;
         Status = IsEnglish ? "Reading hardware information from Windows…" : "Получаем сведения об оборудовании из Windows…";
         HardwareItems.Clear();
+        _hasScannedHardware = false;
         OnPropertyChanged(nameof(HardwareSummary));
+        OnPropertyChanged(nameof(CpuSummary));
+        OnPropertyChanged(nameof(GpuSummary));
+        OnPropertyChanged(nameof(MemorySummary));
         try
         {
             var found = await _hardwareInventory.ScanAsync();
             foreach (var item in found) HardwareItems.Add(item);
+            _hasScannedHardware = true;
+            OnPropertyChanged(nameof(CpuSummary));
+            OnPropertyChanged(nameof(GpuSummary));
+            OnPropertyChanged(nameof(MemorySummary));
             Status = IsEnglish ? "Read-only hardware inventory completed. Check the detected values before relying on them." : "Сбор сведений завершён в режиме только чтения. Проверьте определённые значения.";
         }
         catch (Exception ex)
@@ -108,6 +139,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             IsScanning = false;
             OnPropertyChanged(nameof(HardwareSummary));
+            OnPropertyChanged(nameof(CpuSummary));
+            OnPropertyChanged(nameof(GpuSummary));
+            OnPropertyChanged(nameof(MemorySummary));
         }
     }
 
@@ -152,7 +186,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         foreach (var property in new[]
         {
-            nameof(Navigation), nameof(IsEnglish), nameof(UpdateStatus), nameof(HardwareSummary), nameof(WelcomeLabel),
+            nameof(Navigation), nameof(IsEnglish), nameof(UpdateStatus), nameof(HardwareSummary), nameof(CpuSummary), nameof(GpuSummary), nameof(MemorySummary), nameof(WelcomeLabel),
             nameof(StatusLabel), nameof(ScanLabel), nameof(SettingsHint), nameof(SettingsLabel),
             nameof(LanguageLabel), nameof(ThemeLabel), nameof(ModeLabel), nameof(AccentLabel),
             nameof(UpdatesLabel), nameof(AutoCheckLabel), nameof(WifiDownloadLabel),
