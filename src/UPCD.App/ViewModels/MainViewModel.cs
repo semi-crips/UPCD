@@ -42,8 +42,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
         if (!_hasScannedHardware) return IsEnglish ? "Not scanned" : "Не проверено";
         var count = HardwareItems.Count(x => x.Category.Equals("RAM", StringComparison.OrdinalIgnoreCase));
         if (count == 0) return IsEnglish ? "Not detected" : "Не обнаружено";
-        if (count == 1 && HardwareItems[0].Name.Equals("Installed memory (total)", StringComparison.OrdinalIgnoreCase))
-            return HardwareItems[0].Details;
+        var totalMemory = HardwareItems.FirstOrDefault(x =>
+            x.Category.Equals("RAM", StringComparison.OrdinalIgnoreCase) &&
+            x.Name.Equals("Installed memory (total)", StringComparison.OrdinalIgnoreCase));
+        if (totalMemory is not null)
+            return totalMemory.Details;
         return IsEnglish ? $"{count} module(s) detected" : $"Обнаружено модулей: {count}";
     }
 
